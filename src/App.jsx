@@ -461,9 +461,11 @@ function DataPage() {
               <XAxis type="number" tick={tick} axisLine={false} tickLine={false} tickFormatter={v=>`₹${v}L`} />
               <YAxis type="category" dataKey="brand" tick={tickSm} axisLine={false} tickLine={false} width={65} />
               <Tooltip formatter={v=>[`₹${v}L`,"ASP"]} />
-              {avgPrice.map((d,i) => (
-                <Bar key={i} dataKey="asp" data={[d]} fill={Object.values(BRAND_COLORS)[i]} name={d.brand} radius={[0,2,2,0]} />
-              ))}
+              <Bar dataKey="asp" radius={[0,2,2,0]} name="ASP">
+                {avgPrice.map((d,i) => (
+                  <Cell key={i} fill={Object.values(BRAND_COLORS)[i] || "#1C69D4"} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </ChartBox>
