@@ -27,17 +27,21 @@ const GS = `
 ${FONT_IMPORT}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
-body,#root{background:#05050d;min-height:100vh;}
-::-webkit-scrollbar{width:6px;}
+body,#root{background:#05050d;min-height:100vh;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:#05050d;}
 ::-webkit-scrollbar-thumb{background:#0a3a80;border-radius:3px;}
-.bmw-btn{font-family:'Josefin Sans',sans-serif;font-weight:600;letter-spacing:2px;text-transform:uppercase;border:1.5px solid #1C69D4;background:transparent;color:#FFFFFF;cursor:pointer;transition:all 0.25s;padding:12px 28px;font-size:13px;}
+.bmw-btn{font-family:'Josefin Sans',sans-serif;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;border:1.5px solid #1C69D4;background:transparent;color:#FFFFFF;cursor:pointer;transition:all 0.25s;padding:12px 28px;font-size:13px;white-space:nowrap;}
 .bmw-btn:hover{background:#1C69D4;}
 .bmw-btn.active{background:#1C69D4;}
-.bmw-btn.small{padding:7px 13px;font-size:10px;}
+.bmw-btn.small{padding:7px 11px;font-size:9px;letter-spacing:1px;}
 .section-fade{animation:fadeUp 0.7s ease both;}
 @keyframes fadeUp{from{opacity:0;transform:translateY(28px);}to{opacity:1;transform:translateY(0);}}
-@media(max-width:640px){.hide-mobile{display:none!important;}}
+@media(max-width:767px){.hide-tablet{display:none!important;}}
+@media(max-width:479px){.hide-mobile{display:none!important;}}
+.tab-scroll{display:flex;flex-wrap:wrap;gap:5px;}
+@media(max-width:767px){.tab-scroll{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}}
+@media(max-width:479px){.tab-scroll{grid-template-columns:repeat(2,1fr);}}
 `;
 
 function useWidth() {
@@ -48,6 +52,17 @@ function useWidth() {
     return () => window.removeEventListener("resize", h);
   }, []);
   return w;
+}
+
+// Breakpoint helpers
+function useBP() {
+  const w = useWidth();
+  return {
+    mob: w < 480,      // phones
+    tab: w < 768,      // tablets + phones
+    desk: w >= 768,    // desktop/laptop
+    w,
+  };
 }
 
 const inrFmt = (n) => {
@@ -188,17 +203,17 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 const KPICard = ({ label, value, sub, color="#1C69D4" }) => (
-  <div style={{ background:"#14142a", border:"1px solid #1e1e3a", borderTop:`2px solid ${color}`, padding:"16px 18px", borderRadius:2 }}>
-    <span style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:10, letterSpacing:2, color:"#7070a0", textTransform:"uppercase", display:"block", marginBottom:6 }}>{label}</span>
-    <span style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:26, color:"#FFFFFF", letterSpacing:2, display:"block" }}>{value}</span>
-    {sub && <span style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:10, color }}>{sub}</span>}
+  <div style={{ background:"#14142a", border:"1px solid #1e1e3a", borderTop:`2px solid ${color}`, padding:"12px 14px", borderRadius:2 }}>
+    <span style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:9, letterSpacing:1.5, color:"#7070a0", textTransform:"uppercase", display:"block", marginBottom:4 }}>{label}</span>
+    <span style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:22, color:"#FFFFFF", letterSpacing:2, display:"block" }}>{value}</span>
+    {sub && <span style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:9, color }}>{sub}</span>}
   </div>
 );
 
 const SectionHeader = ({ title, sub }) => (
-  <div style={{ marginBottom:24, borderLeft:"3px solid #1C69D4", paddingLeft:16 }}>
-    <h2 style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:28, letterSpacing:4, color:"#FFFFFF" }}>{title}</h2>
-    {sub && <p style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:12, color:"#7070a0", marginTop:4 }}>{sub}</p>}
+  <div style={{ marginBottom:20, borderLeft:"3px solid #1C69D4", paddingLeft:14 }}>
+    <h2 style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:"clamp(20px,5vw,28px)", letterSpacing:4, color:"#FFFFFF" }}>{title}</h2>
+    {sub && <p style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:"clamp(10px,2.5vw,12px)", color:"#7070a0", marginTop:4, lineHeight:1.5 }}>{sub}</p>}
   </div>
 );
 
@@ -223,8 +238,7 @@ const CLegend = ({ items }) => (
 
 /* ══════════════ LANDING ══════════════ */
 function LandingPage({ onNavigate }) {
-  const w = useWidth();
-  const mob = w < 640;
+  const { mob, tab } = useBP();
 
   const worldTL = [
     { year:"1916", text:"Bayerische Flugzeugwerke AG founded in Munich — aircraft engine manufacturer." },
@@ -249,31 +263,31 @@ function LandingPage({ onNavigate }) {
   return (
     <div className="section-fade">
       {/* HERO */}
-      <div style={{ minHeight:mob?280:460, display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:mob?"48px 18px":"68px 40px", position:"relative", overflow:"hidden", borderBottom:"1px solid #1e1e3a" }}>
+      <div style={{ minHeight:mob?240:tab?360:460, display:"flex", flexDirection:"column", justifyContent:"center", alignItems:"center", textAlign:"center", padding:mob?"40px 16px":tab?"52px 28px":"68px 40px", position:"relative", overflow:"hidden", borderBottom:"1px solid #1e1e3a" }}>
         <div style={{ position:"absolute", inset:0, backgroundImage:"linear-gradient(#252550 1px,transparent 1px),linear-gradient(90deg,#252550 1px,transparent 1px)", backgroundSize:"48px 48px", opacity:0.18, zIndex:0 }} />
-        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:600, height:300, borderRadius:"50%", background:"radial-gradient(ellipse,#0a3a8066 0%,transparent 70%)", zIndex:0 }} />
+        <div style={{ position:"absolute", top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:mob?300:600, height:mob?200:300, borderRadius:"50%", background:"radial-gradient(ellipse,#0a3a8066 0%,transparent 70%)", zIndex:0 }} />
         <div style={{ position:"relative", zIndex:1 }}>
-          <svg width={mob?60:76} height={mob?60:76} viewBox="0 0 80 80" style={{ marginBottom:18 }}>
+          <svg width={mob?50:tab?64:76} height={mob?50:tab?64:76} viewBox="0 0 80 80" style={{ marginBottom:14 }}>
             <circle cx="40" cy="40" r="38" fill="none" stroke="#1C69D4" strokeWidth="3"/>
             <path d="M40 10 A30 30 0 0 0 10 40 L40 40 Z" fill="#FFFFFF"/>
             <path d="M40 40 L70 40 A30 30 0 0 0 40 10 Z" fill="#1C69D4"/>
             <path d="M10 40 A30 30 0 0 0 40 70 L40 40 Z" fill="#1C69D4"/>
             <path d="M40 40 L40 70 A30 30 0 0 0 70 40 Z" fill="#FFFFFF"/>
           </svg>
-          <div style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?10:12, letterSpacing:8, color:"#1C69D4", textTransform:"uppercase", marginBottom:10 }}>Analytical Report — India Market</div>
-          <h1 style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:mob?40:76, letterSpacing:mob?6:12, color:"#FFFFFF", lineHeight:1, marginBottom:14 }}>DRIVEN BY DATA</h1>
-          <p style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?13:15, color:"#c8c8dc", maxWidth:560, lineHeight:1.7, marginBottom:28 }}>
+          <div style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?9:11, letterSpacing:mob?4:8, color:"#1C69D4", textTransform:"uppercase", marginBottom:10 }}>Analytical Report — India Market</div>
+          <h1 style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:mob?36:tab?56:76, letterSpacing:mob?4:tab?8:12, color:"#FFFFFF", lineHeight:1, marginBottom:14 }}>DRIVEN BY DATA</h1>
+          <p style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?12:tab?13:15, color:"#c8c8dc", maxWidth:mob?"100%":560, lineHeight:1.7, marginBottom:24 }}>
             A comprehensive strategic view of BMW's journey — from Munich to Mumbai — covering global legacy, Indian growth story, 12 data visualisations, and forward-looking recommendations.
           </p>
           <div style={{ display:"flex", gap:10, flexWrap:"wrap", justifyContent:"center" }}>
-            <button className="bmw-btn" onClick={() => onNavigate("data")}>View Data Dashboard</button>
-            <button className="bmw-btn" onClick={() => onNavigate("findings")} style={{ borderColor:"#c8c8dc", color:"#c8c8dc" }}>Key Findings</button>
+            <button className="bmw-btn" onClick={() => onNavigate("data")} style={{ fontSize:mob?11:13, padding:mob?"10px 20px":"12px 28px" }}>View Data Dashboard</button>
+            <button className="bmw-btn" onClick={() => onNavigate("findings")} style={{ borderColor:"#c8c8dc", color:"#c8c8dc", fontSize:mob?11:13, padding:mob?"10px 20px":"12px 28px" }}>Key Findings</button>
           </div>
         </div>
       </div>
 
       {/* WORLD HISTORY */}
-      <div style={{ padding:mob?"34px 16px":"52px 48px", borderBottom:"1px solid #1e1e3a" }}>
+      <div style={{ padding:mob?"24px 14px":tab?"36px 28px":"52px 48px", borderBottom:"1px solid #1e1e3a" }}>
         <SectionHeader title="BMW — A Global Legacy" sub="From aircraft engines to the world's leading premium automobile brand" />
         <p style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:14, color:"#c8c8dc", lineHeight:1.8, maxWidth:800, marginBottom:30 }}>
           Founded in 1916 in Munich, Germany, Bayerische Motoren Werke began making aircraft engines. The distinctive blue-and-white roundel evokes a spinning propeller — a symbol of aviation heritage. Over a century later, BMW Group is the world's largest premium automotive manufacturer, selling under BMW, MINI, and Rolls-Royce. The brand philosophy, <span style={{ color:"#1C69D4" }}>"Sheer Driving Pleasure"</span>, permeates every product decision.
@@ -292,12 +306,12 @@ function LandingPage({ onNavigate }) {
       </div>
 
       {/* INDIA HISTORY */}
-      <div style={{ padding:mob?"34px 16px":"52px 48px", background:"#0b0b18", borderBottom:"1px solid #1e1e3a" }}>
+      <div style={{ padding:mob?"24px 14px":tab?"36px 28px":"52px 48px", background:"#0b0b18", borderBottom:"1px solid #1e1e3a" }}>
         <SectionHeader title="BMW in India" sub="Three decades of premium aspiration, localisation, and record growth" />
-        <p style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:14, color:"#c8c8dc", lineHeight:1.8, maxWidth:800, marginBottom:30 }}>
+        <p style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?12:14, color:"#c8c8dc", lineHeight:1.8, maxWidth:800, marginBottom:24 }}>
           BMW entered India in 1994 at a time when economic liberalisation was barely three years old. The 2007 opening of a local assembly plant in Chennai changed the equation — local production reduced costs, shortened delivery cycles, and allowed BMW to price more competitively. With India projected to become the world's third-largest auto market by 2030, BMW's strategic investments position it for its most pivotal decade in the country.
         </p>
-        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:14 }}>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":tab?"1fr":"1fr 1fr", gap:12 }}>
           {indiaTL.map((item,i) => (
             <div key={i} style={{ background:"#14142a", border:"1px solid #1e1e3a", borderLeft:"3px solid #1C69D4", padding:"14px 18px", borderRadius:2 }}>
               <span style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:22, color:"#1C69D4", letterSpacing:3, display:"block", marginBottom:4 }}>{item.year}</span>
@@ -308,8 +322,8 @@ function LandingPage({ onNavigate }) {
       </div>
 
       {/* KPI STRIP */}
-      <div style={{ padding:mob?"26px 16px":"34px 48px", borderBottom:"1px solid #1e1e3a" }}>
-        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"repeat(4,1fr)", gap:12 }}>
+      <div style={{ padding:mob?"16px 14px":tab?"22px 28px":"34px 48px", borderBottom:"1px solid #1e1e3a" }}>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":tab?"repeat(2,1fr)":"repeat(4,1fr)", gap:10 }}>
           <KPICard label="India Units (2024)"    value="14,856"    sub="+6.7% YoY"             color="#1C69D4" />
           <KPICard label="Chennai Output (2024)" value="13,200"    sub="Units assembled"        color="#FF9500" />
           <KPICard label="India Luxury Share"    value="29%"       sub="of luxury segment"      color="#00C851" />
@@ -318,13 +332,13 @@ function LandingPage({ onNavigate }) {
       </div>
 
       {/* CTA */}
-      <div style={{ padding:mob?"34px 16px":"52px 48px", textAlign:"center" }}>
-        <h3 style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:26, letterSpacing:4, color:"#FFFFFF", marginBottom:10 }}>Explore the Full Analysis</h3>
-        <p style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:13, color:"#7070a0", marginBottom:22 }}>12 interactive data visualisations, competitive benchmarks, key findings & strategic recommendations.</p>
-        <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap" }}>
-          <button className="bmw-btn" onClick={() => onNavigate("data")}>Data Visualisation</button>
-          <button className="bmw-btn" onClick={() => onNavigate("findings")} style={{ borderColor:"#FF9500", color:"#FF9500" }}>Key Findings</button>
-          <button className="bmw-btn" onClick={() => onNavigate("recommendations")} style={{ borderColor:"#00C851", color:"#00C851" }}>Recommendations</button>
+      <div style={{ padding:mob?"28px 14px":tab?"36px 28px":"52px 48px", textAlign:"center" }}>
+        <h3 style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:mob?22:26, letterSpacing:4, color:"#FFFFFF", marginBottom:10 }}>Explore the Full Analysis</h3>
+        <p style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?11:13, color:"#7070a0", marginBottom:20 }}>12 interactive data visualisations, competitive benchmarks, key findings & strategic recommendations.</p>
+        <div style={{ display:"flex", gap:8, justifyContent:"center", flexWrap:"wrap" }}>
+          <button className="bmw-btn" onClick={() => onNavigate("data")} style={{ fontSize:mob?11:13, padding:mob?"9px 18px":"12px 28px" }}>Data Visualisation</button>
+          <button className="bmw-btn" onClick={() => onNavigate("findings")} style={{ borderColor:"#FF9500", color:"#FF9500", fontSize:mob?11:13, padding:mob?"9px 18px":"12px 28px" }}>Key Findings</button>
+          <button className="bmw-btn" onClick={() => onNavigate("recommendations")} style={{ borderColor:"#00C851", color:"#00C851", fontSize:mob?11:13, padding:mob?"9px 18px":"12px 28px" }}>Recommendations</button>
         </div>
       </div>
     </div>
@@ -333,8 +347,7 @@ function LandingPage({ onNavigate }) {
 
 /* ══════════════ DATA PAGE ══════════════ */
 function DataPage() {
-  const w = useWidth();
-  const mob = w < 640;
+  const { mob, tab } = useBP();
   const [activeViz, setActiveViz] = useState("sales");
 
   const tabs = [
@@ -352,15 +365,16 @@ function DataPage() {
     { id:"seg",       label:"Model Mix"         },
   ];
 
-  const tick = { fill:"#7070a0", fontFamily:"'Share Tech Mono',monospace", fontSize:10 };
-  const tickSm = { fill:"#7070a0", fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?9:11 };
+  const tick = { fill:"#7070a0", fontFamily:"'Share Tech Mono',monospace", fontSize:mob?8:10 };
+  const tickSm = { fill:"#7070a0", fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?8:tab?9:11 };
+  const ch = (d=260, t=220, m=180) => mob?m:tab?t:d; // chart height helper
 
   return (
-    <div className="section-fade" style={{ padding:mob?"20px 10px":"34px 38px" }}>
+    <div className="section-fade" style={{ padding:mob?"16px 10px":tab?"24px 18px":"34px 38px" }}>
       <SectionHeader title="Data Visualisation" sub="12 charts — BMW India & Global: Sales, Market Share, Revenue, Profit, Assembly & Competitive Benchmarks (INR)" />
 
       {/* KPIs */}
-      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":"repeat(4,1fr)", gap:10, marginBottom:24 }}>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr 1fr":tab?"repeat(2,1fr)":"repeat(4,1fr)", gap:8, marginBottom:20 }}>
         <KPICard label="India Peak Sales"   value="14,856"     sub="Units FY2024"          color="#1C69D4" />
         <KPICard label="India Rev (2024)"   value="₹18,257Cr"  sub="Estimated gross"       color="#FF9500" />
         <KPICard label="Global Revenue"     value="₹10.98L Cr" sub="BMW Group FY2024"      color="#00C851" />
@@ -368,7 +382,7 @@ function DataPage() {
       </div>
 
       {/* TABS */}
-      <div style={{ display:"flex", flexWrap:"wrap", gap:5, marginBottom:22 }}>
+      <div className="tab-scroll" style={{ marginBottom:18 }}>
         {tabs.map(t => (
           <button key={t.id} className={`bmw-btn small ${activeViz===t.id?"active":""}`} onClick={() => setActiveViz(t.id)}>{t.label}</button>
         ))}
@@ -377,7 +391,7 @@ function DataPage() {
       {/* ─── SALES TREND ─── */}
       {activeViz==="sales" && <>
         <ChartBox title="BMW India — Annual Unit Sales & Estimated Revenue (₹ Cr)">
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={ch(260,220,180)}>
             <ComposedChart data={[
               {year:"2018",units:9453, revenue:10858},{year:"2019",units:10001,revenue:11501},
               {year:"2020",units:8083, revenue:9296}, {year:"2021",units:9512, revenue:10939},
@@ -395,7 +409,7 @@ function DataPage() {
           </ResponsiveContainer>
         </ChartBox>
         <ChartBox title="Year-on-Year Growth (%)">
-          <ResponsiveContainer width="100%" height={180}>
+          <ResponsiveContainer width="100%" height={ch(180,160,140)}>
             <AreaChart data={[
               {year:"2019",g:5.8},{year:"2020",g:-19.2},{year:"2021",g:17.7},
               {year:"2022",g:13.5},{year:"2023",g:28.9},{year:"2024",g:6.7},
@@ -414,7 +428,7 @@ function DataPage() {
       {activeViz==="brandcomp" && <>
         <ChartBox title="Premium Brand India Sales — Units Over Time (2019–2024)">
           <CLegend items={Object.entries(BRAND_COLORS).map(([k,v])=>({label:k,color:v}))} />
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={ch(300,250,200)}>
             <LineChart data={brandSalesIndia} margin={{ left:0, right:16, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" />
               <XAxis dataKey="year" tick={tick} axisLine={{ stroke:"#1e1e3a" }} tickLine={false} />
@@ -427,7 +441,7 @@ function DataPage() {
           </ResponsiveContainer>
         </ChartBox>
         <ChartBox title="2024 India Units — All Brands Side by Side">
-          <ResponsiveContainer width="100%" height={240}>
+          <ResponsiveContainer width="100%" height={ch(240,200,180)}>
             <BarChart data={[brandSalesIndia[5]]} margin={{ left:0, right:16, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" />
               <XAxis dataKey="year" tick={tick} axisLine={{ stroke:"#1e1e3a" }} tickLine={false} />
@@ -441,7 +455,7 @@ function DataPage() {
           </ResponsiveContainer>
         </ChartBox>
         <ChartBox title="Average Selling Price by Brand — India 2024 (₹ Lakh)" note="ASP estimated from reported volumes and disclosed revenue ranges.">
-          <ResponsiveContainer width="100%" height={240}>
+          <ResponsiveContainer width="100%" height={ch(240,210,200)}>
             <BarChart data={avgPrice} layout="vertical" margin={{ left:0, right:50, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" horizontal={false} />
               <XAxis type="number" tick={tick} axisLine={false} tickLine={false} tickFormatter={v=>`₹${v}L`} />
@@ -458,8 +472,8 @@ function DataPage() {
       {/* ─── LUXURY SHARE ─── */}
       {activeViz==="luxshare" && <>
         <ChartBox title="India Luxury Car Market Share — 2024 (%)">
-          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:22 }}>
-            <ResponsiveContainer width="100%" height={300}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":tab?"1fr":"1fr 1fr", gap:22 }}>
+            <ResponsiveContainer width="100%" height={ch(300,260,240)}>
               <PieChart>
                 <Pie data={luxuryShare} dataKey="share" nameKey="brand" cx="50%" cy="50%" outerRadius={120} innerRadius={60} stroke="none">
                   {luxuryShare.map((s,i)=><Cell key={i} fill={s.color}/>)}
@@ -486,7 +500,7 @@ function DataPage() {
         </ChartBox>
         <ChartBox title="Global Volume Comparison — BMW vs Mercedes vs Audi ('000 units)" note="BMW Group includes BMW, MINI & Rolls-Royce combined.">
           <CLegend items={[{label:"BMW Group",color:"#1C69D4"},{label:"Mercedes-Benz",color:"#c8c8dc"},{label:"Audi Group",color:"#FF9500"}]} />
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={ch(260,220,190)}>
             <BarChart data={globalVolumes} margin={{ left:0, right:16, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" />
               <XAxis dataKey="year" tick={tick} axisLine={{ stroke:"#1e1e3a" }} tickLine={false} />
@@ -504,7 +518,7 @@ function DataPage() {
       {activeViz==="segment" && <>
         <ChartBox title="India Auto Industry — Segment Volumes ('000 units, Stacked) 2019–2024">
           <CLegend items={[{label:"Economy <₹10L",color:"#7070a0"},{label:"Premium ₹25–50L",color:"#4d8de8"},{label:"Luxury ₹50L+",color:"#1C69D4"}]} />
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={ch(300,250,200)}>
             <AreaChart data={luxuryVsTotal} margin={{ left:0, right:16, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" />
               <XAxis dataKey="year" tick={tick} axisLine={{ stroke:"#1e1e3a" }} tickLine={false} />
@@ -517,12 +531,12 @@ function DataPage() {
           </ResponsiveContainer>
         </ChartBox>
         <ChartBox title="Segment Revenue Share & Growth — India 2024" note="Revenue is estimated gross market size in ₹ Thousand Crore.">
-          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:18 }}>
-            <ResponsiveContainer width="100%" height={260}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":tab?"1fr":"1fr 1fr", gap:18 }}>
+            <ResponsiveContainer width="100%" height={ch(260,230,220)}>
               <BarChart data={segmentShare} layout="vertical" margin={{ left:0, right:40, top:8, bottom:0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" horizontal={false} />
                 <XAxis type="number" tick={tick} axisLine={false} tickLine={false} tickFormatter={v=>`${v}%`} />
-                <YAxis type="category" dataKey="segment" tick={{ fill:"#c8c8dc", fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?8:10 }} axisLine={false} tickLine={false} width={mob?110:130} />
+                <YAxis type="category" dataKey="segment" tick={{ fill:"#c8c8dc", fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?7:10 }} axisLine={false} tickLine={false} width={mob?95:130} />
                 <Tooltip formatter={(v,n)=>[n==="share"?`${v}%`:`₹${v}K Cr`,n==="share"?"Vol. Share":"Revenue"]} />
                 <Bar dataKey="share" fill="#1C69D4" radius={[0,2,2,0]} name="share" />
               </BarChart>
@@ -546,7 +560,7 @@ function DataPage() {
       {activeViz==="assembly" && <>
         <ChartBox title="BMW Chennai Assembly Plant — Production vs Capacity (Units, 2009–2024)">
           <CLegend items={[{label:"Capacity",color:"#252550"},{label:"Units Produced",color:"#1C69D4"},{label:"Production Trend",color:"#00C851"}]} />
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={ch(300,250,200)}>
             <ComposedChart data={assemblyProduction} margin={{ left:0, right:16, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" />
               <XAxis dataKey="year" tick={tick} axisLine={{ stroke:"#1e1e3a" }} tickLine={false} />
@@ -559,7 +573,7 @@ function DataPage() {
           </ResponsiveContainer>
         </ChartBox>
         <ChartBox title="Capacity Utilisation — Chennai Plant (%)">
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={ch(200,170,150)}>
             <AreaChart data={assemblyProduction.map(d=>({ year:d.year, util:Math.round(d.produced/d.capacity*100) }))} margin={{ left:0, right:16, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" />
               <XAxis dataKey="year" tick={tick} axisLine={{ stroke:"#1e1e3a" }} tickLine={false} />
@@ -570,8 +584,8 @@ function DataPage() {
           </ResponsiveContainer>
         </ChartBox>
         <ChartBox title="Chennai Plant — Model Mix Assembled 2024 Estimate">
-          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:18 }}>
-            <ResponsiveContainer width="100%" height={260}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":tab?"1fr":"1fr 1fr", gap:18 }}>
+            <ResponsiveContainer width="100%" height={ch(260,230,220)}>
               <PieChart>
                 <Pie data={modelMix} dataKey="pct" cx="50%" cy="50%" outerRadius={105} innerRadius={50} stroke="none">
                   {modelMix.map((m,i)=><Cell key={i} fill={m.color}/>)}
@@ -595,7 +609,7 @@ function DataPage() {
       {/* ─── PRICING ─── */}
       {activeViz==="price" && (
         <ChartBox title="BMW vs Competitor Ex-Showroom Pricing — India (₹)" note="Competitor avg. based on Mercedes-Benz & Audi equivalent segment pricing.">
-          <ResponsiveContainer width="100%" height={360}>
+          <ResponsiveContainer width="100%" height={ch(360,320,300)}>
             <BarChart data={[
               {model:"3 Series",BMW:4900000,Rival:4200000},
               {model:"5 Series",BMW:7200000,Rival:6800000},
@@ -605,12 +619,12 @@ function DataPage() {
               {model:"X5",BMW:9500000,Rival:8900000},
               {model:"X7",BMW:14000000,Rival:13000000},
               {model:"iX",BMW:13100000,Rival:11800000},
-            ]} layout="vertical" margin={{ left:0, right:50, top:8, bottom:0 }}>
+            ]} layout="vertical" margin={{ left:0, right:mob?20:50, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" horizontal={false} />
               <XAxis type="number" tick={tick} axisLine={false} tickLine={false} tickFormatter={v=>inrFmt(v)} />
-              <YAxis type="category" dataKey="model" tick={tickSm} axisLine={false} tickLine={false} width={65} />
+              <YAxis type="category" dataKey="model" tick={tickSm} axisLine={false} tickLine={false} width={mob?55:65} />
               <Tooltip content={<CustomTooltip />} />
-              <Legend wrapperStyle={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:11, color:"#7070a0" }} />
+              <Legend wrapperStyle={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?9:11, color:"#7070a0" }} />
               <Bar dataKey="BMW"   fill="#1C69D4" name="BMW (₹)"       radius={[0,2,2,0]} />
               <Bar dataKey="Rival" fill="#7070a0" name="Avg Rival (₹)" radius={[0,2,2,0]} />
             </BarChart>
@@ -621,8 +635,8 @@ function DataPage() {
       {/* ─── REGIONAL ─── */}
       {activeViz==="region" && (
         <ChartBox title="BMW India — Regional Sales Distribution 2024">
-          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:22 }}>
-            <ResponsiveContainer width="100%" height={260}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":tab?"1fr":"1fr 1fr", gap:22 }}>
+            <ResponsiveContainer width="100%" height={ch(260,230,200)}>
               <BarChart data={[{r:"North",u:4159},{r:"West",u:5199},{r:"South",u:3714},{r:"East",u:1784}]} margin={{ left:0, right:16, top:8, bottom:0 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" />
                 <XAxis dataKey="r" tick={tick} axisLine={{ stroke:"#1e1e3a" }} tickLine={false} />
@@ -653,7 +667,7 @@ function DataPage() {
       {activeViz==="ev" && (
         <ChartBox title="BMW EV Portfolio — India Sales Growth (Units)" note="Estimated from public disclosures and industry reports.">
           <CLegend items={[{label:"BMW iX",color:"#1C69D4"},{label:"BMW i4",color:"#00C851"},{label:"BMW iX1",color:"#FF9500"}]} />
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={ch(280,240,200)}>
             <AreaChart data={[
               {year:"2021",iX:0,i4:0,iX1:0},
               {year:"2022",iX:210,i4:180,iX1:0},
@@ -676,7 +690,7 @@ function DataPage() {
       {activeViz==="revenue" && <>
         <ChartBox title="India Revenue Comparison — All Premium Brands (₹ Crore)" note="Revenue = estimated units × average transaction price per brand.">
           <CLegend items={Object.entries(BRAND_COLORS).map(([k,v])=>({label:k,color:v}))} />
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={ch(300,260,220)}>
             <BarChart data={brandRevenueIndia} margin={{ left:0, right:16, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" />
               <XAxis dataKey="year" tick={tick} axisLine={{ stroke:"#1e1e3a" }} tickLine={false} />
@@ -690,7 +704,7 @@ function DataPage() {
         </ChartBox>
         <ChartBox title="Global Revenue — BMW vs Mercedes vs Audi (₹ Thousand Crore)" note="Converted from EUR at ~₹90/€. BMW = BMW Group total.">
           <CLegend items={[{label:"BMW Group",color:"#1C69D4"},{label:"Mercedes-Benz",color:"#c8c8dc"},{label:"Audi Group",color:"#FF9500"}]} />
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={ch(280,240,200)}>
             <ComposedChart data={globalRevenue} margin={{ left:0, right:16, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" />
               <XAxis dataKey="year" tick={tick} axisLine={{ stroke:"#1e1e3a" }} tickLine={false} />
@@ -709,7 +723,7 @@ function DataPage() {
       {activeViz==="profit" && <>
         <ChartBox title="Global Net Profit — BMW vs Mercedes vs Audi (₹ Thousand Crore)" note="Net profit converted from reported EUR at ₹90/€. 2021–22 boom driven by supply constraints + strong pricing power.">
           <CLegend items={[{label:"BMW Group",color:"#1C69D4"},{label:"Mercedes-Benz",color:"#c8c8dc"},{label:"Audi Group",color:"#FF9500"}]} />
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={ch(280,240,200)}>
             <BarChart data={globalProfit} margin={{ left:0, right:16, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" />
               <XAxis dataKey="year" tick={tick} axisLine={{ stroke:"#1e1e3a" }} tickLine={false} />
@@ -723,7 +737,7 @@ function DataPage() {
         </ChartBox>
         <ChartBox title="Net Profit Margin (%) — BMW vs Mercedes vs Audi">
           <CLegend items={[{label:"BMW",color:"#1C69D4"},{label:"Mercedes",color:"#c8c8dc"},{label:"Audi",color:"#FF9500"}]} />
-          <ResponsiveContainer width="100%" height={240}>
+          <ResponsiveContainer width="100%" height={ch(240,210,180)}>
             <LineChart data={profitMargin} margin={{ left:0, right:16, top:8, bottom:0 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e1e3a" />
               <XAxis dataKey="year" tick={tick} axisLine={{ stroke:"#1e1e3a" }} tickLine={false} />
@@ -735,18 +749,18 @@ function DataPage() {
             </LineChart>
           </ResponsiveContainer>
         </ChartBox>
-        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"repeat(3,1fr)", gap:12 }}>
+        <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":tab?"1fr":"repeat(3,1fr)", gap:12 }}>
           {[
             {brand:"BMW Group",     profit:"₹98K Cr",  margin:"8.9%",  rev:"₹10.98L Cr", color:"#1C69D4"},
             {brand:"Mercedes-Benz", profit:"₹110K Cr", margin:"10.8%", rev:"₹10.23L Cr", color:"#c8c8dc"},
             {brand:"Audi Group",    profit:"₹72K Cr",  margin:"10.1%", rev:"₹7.10L Cr",  color:"#FF9500"},
           ].map((b,i)=>(
-            <div key={i} style={{ background:"#14142a", border:"1px solid #1e1e3a", borderTop:`2px solid ${b.color}`, padding:"16px 18px", borderRadius:2 }}>
+            <div key={i} style={{ background:"#14142a", border:"1px solid #1e1e3a", borderTop:`2px solid ${b.color}`, padding:"14px 16px", borderRadius:2 }}>
               <span style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:17, letterSpacing:3, color:b.color, display:"block", marginBottom:8 }}>{b.brand}</span>
               {[["Net Profit",b.profit,b.color],["Margin",b.margin,"#00C851"],["Revenue",b.rev,"#c8c8dc"]].map(([l,v,c],j)=>(
                 <div key={j} style={{ display:"flex", justifyContent:"space-between", marginBottom:5 }}>
                   <span style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:11, color:"#7070a0" }}>{l}</span>
-                  <span style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:12, color:c }}>{v}</span>
+                  <span style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:11, color:c }}>{v}</span>
                 </div>
               ))}
             </div>
@@ -758,7 +772,7 @@ function DataPage() {
       {activeViz==="radar" && (
         <ChartBox title="Competitive Benchmark — BMW vs Mercedes vs Audi (India, Composite Score 0–100)" note="Analyst-composite indices based on brand perception, reviews, and consumer surveys.">
           <CLegend items={[{label:"BMW",color:"#1C69D4"},{label:"Mercedes",color:"#c8c8dc"},{label:"Audi",color:"#FF9500"}]} />
-          <ResponsiveContainer width="100%" height={340}>
+          <ResponsiveContainer width="100%" height={ch(340,300,280)}>
             <RadarChart data={[
               {axis:"Performance",BMW:92,Mercedes:88,Audi:85},
               {axis:"Luxury",     BMW:88,Mercedes:93,Audi:86},
@@ -767,10 +781,10 @@ function DataPage() {
               {axis:"Value",      BMW:72,Mercedes:68,Audi:75},
               {axis:"EV Range",   BMW:78,Mercedes:80,Audi:82},
               {axis:"Aftersales", BMW:80,Mercedes:85,Audi:78},
-            ]} cx="50%" cy="50%" outerRadius={mob?90:120}>
+            ]} cx="50%" cy="50%" outerRadius={mob?80:tab?100:120}>
               <PolarGrid stroke="#1e1e3a" />
-              <PolarAngleAxis dataKey="axis" tick={{ fill:"#c8c8dc", fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?10:12 }} />
-              <PolarRadiusAxis tick={{ fill:"#7070a0", fontSize:9 }} axisLine={false} tickCount={4} />
+              <PolarAngleAxis dataKey="axis" tick={{ fill:"#c8c8dc", fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?9:12 }} />
+              <PolarRadiusAxis tick={{ fill:"#7070a0", fontSize:8 }} axisLine={false} tickCount={4} />
               <Radar name="BMW"      dataKey="BMW"      stroke="#1C69D4" fill="#1C69D440" strokeWidth={2} />
               <Radar name="Mercedes" dataKey="Mercedes" stroke="#c8c8dc" fill="#c8c8dc20" strokeWidth={2} />
               <Radar name="Audi"     dataKey="Audi"     stroke="#FF9500" fill="#FF950020" strokeWidth={2} />
@@ -783,8 +797,8 @@ function DataPage() {
       {/* ─── MODEL MIX ─── */}
       {activeViz==="seg" && (
         <ChartBox title="BMW India Sales by Model Segment — 2024 Estimate">
-          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:20 }}>
-            <ResponsiveContainer width="100%" height={280}>
+          <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":tab?"1fr":"1fr 1fr", gap:20 }}>
+            <ResponsiveContainer width="100%" height={ch(280,250,230)}>
               <PieChart>
                 <Pie data={[
                   {name:"3 Series",value:32,color:"#1C69D4"},
@@ -793,18 +807,18 @@ function DataPage() {
                   {name:"7 Series",value:12,color:"#c8c8dc"},
                   {name:"Electric",value:8, color:"#00C851"},
                   {name:"Others",  value:6, color:"#7070a0"},
-                ]} dataKey="value" cx="50%" cy="50%" outerRadius={110} innerRadius={55} stroke="none">
+                ]} dataKey="value" cx="50%" cy="50%" outerRadius={mob?90:110} innerRadius={mob?45:55} stroke="none">
                   {["#1C69D4","#4d8de8","#FF9500","#c8c8dc","#00C851","#7070a0"].map((c,i)=><Cell key={i} fill={c}/>)}
                 </Pie>
                 <Tooltip formatter={v=>[`${v}%`]} />
               </PieChart>
             </ResponsiveContainer>
-            <div style={{ display:"flex", flexDirection:"column", justifyContent:"center", gap:12 }}>
+            <div style={{ display:"flex", flexDirection:"column", justifyContent:mob?"flex-start":"center", gap:10 }}>
               {[{n:"3 Series",v:32,c:"#1C69D4"},{n:"5 Series",v:22,c:"#4d8de8"},{n:"X5/X7",v:20,c:"#FF9500"},{n:"7 Series",v:12,c:"#c8c8dc"},{n:"Electric",v:8,c:"#00C851"},{n:"Others",v:6,c:"#7070a0"}].map((s,i)=>(
                 <div key={i} style={{ display:"flex", alignItems:"center", gap:10 }}>
                   <div style={{ width:10, height:10, borderRadius:2, background:s.c, flexShrink:0 }} />
-                  <span style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:13, color:"#c8c8dc", flex:1 }}>{s.n}</span>
-                  <span style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:13, color:s.c }}>{s.v}%</span>
+                  <span style={{ fontFamily:"'Josefin Sans',sans-serif", fontSize:mob?11:13, color:"#c8c8dc", flex:1 }}>{s.n}</span>
+                  <span style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:mob?11:13, color:s.c }}>{s.v}%</span>
                 </div>
               ))}
             </div>
@@ -817,7 +831,7 @@ function DataPage() {
 
 /* ══════════════ FINDINGS ══════════════ */
 function FindingsPage() {
-  const w = useWidth(); const mob = w < 640;
+  const { mob, tab } = useBP();
   const findings = [
     {icon:"↑",color:"#00C851",title:"Explosive Post-Pandemic Recovery",body:"BMW India's 2023 surge of 28.9% (13,926 units) was the strongest single-year growth in the brand's India history. The trajectory signals India is transitioning from a niche to a core BMW growth market."},
     {icon:"⚡",color:"#4d8de8",title:"EV Adoption is Real, But Fragile",body:"The iX1 at ₹66L ex-showroom catalysed genuine EV interest. However, charging infrastructure outside Tier-1 cities remains critical. BMW's ~10% EV mix is impressive but will stall without deeper charger networks."},
@@ -827,9 +841,9 @@ function FindingsPage() {
     {icon:"★",color:"#c8c8dc",title:"Mercedes Holds Market Share Lead",body:"Mercedes commands 41% of India's luxury segment vs BMW's 29%. The gap is structural — Mercedes has a wider dealer footprint in Tier-2 cities and a stronger corporate fleet presence."},
   ];
   return (
-    <div className="section-fade" style={{ padding:mob?"22px 12px":"34px 38px" }}>
+    <div className="section-fade" style={{ padding:mob?"16px 10px":tab?"24px 18px":"34px 38px" }}>
       <SectionHeader title="Key Findings" sub="My perspective on BMW India's market dynamics — strengths, gaps, and emerging signals" />
-      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":"1fr 1fr", gap:14, marginBottom:18 }}>
+      <div style={{ display:"grid", gridTemplateColumns:mob?"1fr":tab?"1fr":"1fr 1fr", gap:12, marginBottom:16 }}>
         {findings.map((f,i)=>(
           <div key={i} style={{ background:"#14142a", border:"1px solid #1e1e3a", borderLeft:`3px solid ${f.color}`, padding:"18px 20px", borderRadius:2 }}>
             <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:8 }}>
@@ -852,7 +866,7 @@ function FindingsPage() {
 
 /* ══════════════ RECOMMENDATIONS ══════════════ */
 function RecommendationsPage() {
-  const w = useWidth(); const mob = w < 640;
+  const { mob, tab } = useBP();
   const recs = [
     {priority:"HIGH",   color:"#E60026",title:"Build a Tier-2 City Dealer Network",       detail:"Cities like Jaipur, Lucknow, Chandigarh, Coimbatore, and Kochi have rapidly expanding HNI populations but limited BMW touchpoints. A lightweight 'BMW Studio' format — smaller footprint, digital-first test-drive booking — could profitably expand reach without full dealership capex.",impact:"Volume +12–18% over 3 years"},
     {priority:"HIGH",   color:"#E60026",title:"Invest Directly in Charging Infrastructure",detail:"BMW should partner with Tata Power and Reliance BP Pulse to co-brand 150+ fast-chargers along India's top 10 highway corridors by 2027. Position it as 'BMW Charge' — seamless, app-integrated. This reduces range anxiety and directly accelerates iX/i4/iX1 uptake.",impact:"EV mix 10% → 25% by 2027"},
@@ -863,7 +877,7 @@ function RecommendationsPage() {
     {priority:"LOW",    color:"#00C851",title:"Strengthen Corporate Fleet Sales",           detail:"BMW's corporate fleet penetration is significantly lower than Mercedes. A dedicated fleet team targeting MNCs and consulting firms for 5 Series and 7 Series executive transport would add a predictable, lower-CAC volume channel.",impact:"Volume stability, B2B revenue"},
   ];
   return (
-    <div className="section-fade" style={{ padding:mob?"22px 12px":"34px 38px" }}>
+    <div className="section-fade" style={{ padding:mob?"16px 10px":tab?"24px 18px":"34px 38px" }}>
       <SectionHeader title="My Recommendations" sub="Strategic suggestions for BMW India's next growth chapter — prioritised by impact & urgency" />
       <div style={{ display:"flex", gap:14, marginBottom:18, flexWrap:"wrap" }}>
         {[["HIGH","#E60026"],["MEDIUM","#FF9500"],["LOW","#00C851"]].map(([p,c])=>(
@@ -901,29 +915,29 @@ function RecommendationsPage() {
 /* ══════════════ APP SHELL ══════════════ */
 export default function App() {
   const [page, setPage] = useState("home");
-  const w = useWidth(); const mob = w < 640;
+  const { mob, tab } = useBP();
   const topRef = useRef(null);
   const navigate = (p) => { setPage(p); topRef.current?.scrollIntoView({ behavior:"smooth" }); };
-  const navItems = [{id:"home",label:"Home"},{id:"data",label:"Data"},{id:"findings",label:"Findings"},{id:"recommendations",label:"Recommendations"}];
+  const navItems = [{id:"home",label:"Home"},{id:"data",label:"Data"},{id:"findings",label:"Findings"},{id:"recommendations",label:"Recs"}];
 
   return (
     <>
       <style>{GS}</style>
       <div ref={topRef} style={{ minHeight:"100vh", background:"#05050d", color:"#eeeeff", fontFamily:"'Josefin Sans',sans-serif" }}>
-        <nav style={{ position:"sticky", top:0, zIndex:100, background:"#05050dee", backdropFilter:"blur(12px)", borderBottom:"1px solid #1e1e3a", display:"flex", alignItems:"center", justifyContent:"space-between", padding:mob?"12px 14px":"14px 40px", gap:10 }}>
-          <div style={{ display:"flex", alignItems:"center", gap:10, cursor:"pointer" }} onClick={() => navigate("home")}>
-            <svg width="30" height="30" viewBox="0 0 80 80">
+        <nav style={{ position:"sticky", top:0, zIndex:100, background:"#05050dee", backdropFilter:"blur(12px)", borderBottom:"1px solid #1e1e3a", display:"flex", alignItems:"center", justifyContent:"space-between", padding:mob?"10px 12px":tab?"12px 20px":"14px 40px", gap:8 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8, cursor:"pointer", flexShrink:0 }} onClick={() => navigate("home")}>
+            <svg width={mob?24:30} height={mob?24:30} viewBox="0 0 80 80">
               <circle cx="40" cy="40" r="38" fill="none" stroke="#1C69D4" strokeWidth="3"/>
               <path d="M40 10 A30 30 0 0 0 10 40 L40 40 Z" fill="#FFFFFF"/>
               <path d="M40 40 L70 40 A30 30 0 0 0 40 10 Z" fill="#1C69D4"/>
               <path d="M10 40 A30 30 0 0 0 40 70 L40 40 Z" fill="#1C69D4"/>
               <path d="M40 40 L40 70 A30 30 0 0 0 70 40 Z" fill="#FFFFFF"/>
             </svg>
-            <span style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:mob?15:20, letterSpacing:4, color:"#FFFFFF" }}>{mob?"BMW":"BMW INDIA ANALYTICS"}</span>
+            <span style={{ fontFamily:"'Bebas Neue',sans-serif", fontSize:mob?13:tab?16:20, letterSpacing:mob?2:4, color:"#FFFFFF", whiteSpace:"nowrap" }}>{mob?"BMW":"BMW INDIA"}</span>
           </div>
-          <div style={{ display:"flex", gap:mob?2:6, flexWrap:"wrap" }}>
+          <div style={{ display:"flex", gap:mob?0:4 }}>
             {navItems.map(n=>(
-              <button key={n.id} onClick={() => navigate(n.id)} style={{ fontFamily:"'Josefin Sans',sans-serif", fontWeight:600, fontSize:mob?9:12, letterSpacing:2, textTransform:"uppercase", background:"transparent", border:"none", cursor:"pointer", padding:mob?"6px 8px":"8px 14px", color:page===n.id?"#FFFFFF":"#7070a0", borderBottom:page===n.id?"2px solid #1C69D4":"2px solid transparent", transition:"all 0.2s" }}>{n.label}</button>
+              <button key={n.id} onClick={() => navigate(n.id)} style={{ fontFamily:"'Josefin Sans',sans-serif", fontWeight:600, fontSize:mob?9:tab?10:12, letterSpacing:mob?1:2, textTransform:"uppercase", background:"transparent", border:"none", cursor:"pointer", padding:mob?"6px 7px":tab?"7px 10px":"8px 14px", color:page===n.id?"#FFFFFF":"#7070a0", borderBottom:page===n.id?"2px solid #1C69D4":"2px solid transparent", transition:"all 0.2s", whiteSpace:"nowrap" }}>{n.label}</button>
             ))}
           </div>
         </nav>
@@ -931,9 +945,9 @@ export default function App() {
         {page==="data"            && <DataPage          />}
         {page==="findings"        && <FindingsPage      />}
         {page==="recommendations" && <RecommendationsPage />}
-        <footer style={{ borderTop:"1px solid #1e1e3a", padding:mob?"16px 14px":"20px 48px", display:"flex", flexDirection:mob?"column":"row", justifyContent:"space-between", alignItems:mob?"flex-start":"center", gap:8 }}>
-          <span style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:11, color:"#7070a0" }}>BMW India Analytics Dashboard — Personal Academic Report</span>
-          <span style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:11, color:"#2a2a48" }}>Data: Public sources & industry estimates • Not affiliated with BMW AG</span>
+        <footer style={{ borderTop:"1px solid #1e1e3a", padding:mob?"12px 12px":tab?"16px 20px":"20px 48px", display:"flex", flexDirection:mob?"column":"row", justifyContent:"space-between", alignItems:mob?"flex-start":"center", gap:6 }}>
+          <span style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:mob?9:11, color:"#7070a0" }}>BMW India Analytics Dashboard — Personal Academic Report</span>
+          <span style={{ fontFamily:"'Share Tech Mono',monospace", fontSize:mob?9:11, color:"#2a2a48" }}>Data: Public sources & industry estimates • Not affiliated with BMW AG</span>
         </footer>
       </div>
     </>
